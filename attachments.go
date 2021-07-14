@@ -9,9 +9,9 @@ type reqUploadAttachment struct {
 }
 
 // UploadAttachment uploads an attachment to the given conversation > thread
-func (h *HelpScout) UploadAttachment(conversationID int, threadID int, name string, mimeType string, data []byte) (resp []byte, err error) {
+func (h *HelpScout) UploadAttachment(conversationID uint64, threadID uint64, name string, mimeType string, data []byte) (resp []byte, err error) {
 	_, _, resp, err = h.Exec(
-		"conversations/"+strconv.Itoa(conversationID)+"/threads/"+strconv.Itoa(threadID)+"/attachments",
+		"conversations/"+strconv.FormatUint(conversationID, 64)+"/threads/"+strconv.FormatUint(threadID, 64)+"/attachments",
 		reqUploadAttachment{
 			Name:     name,
 			MimeType: mimeType,

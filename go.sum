@@ -1,0 +1,6 @@
+github.com/StirlingMarketingGroup/go-retry v0.0.0-20190512160921-94a8eb23e893 h1:y1OlgL2twHNQGJ4OTHhvVLebgDCwP4pttmZc2w4UAz8=
+github.com/StirlingMarketingGroup/go-retry v0.0.0-20190512160921-94a8eb23e893/go.mod h1:RHK0VFlYDZQeNFg4C2dp7cPE6urfbpgyEZIGxa9f5zw=
+github.com/logrusorgru/aurora v2.0.3+incompatible h1:tOpm7WcpBTn4fjmVfgpQq0EfczGlG91VSDkswnjF5A8=
+github.com/logrusorgru/aurora v2.0.3+incompatible/go.mod h1:7rIyQOR62GCctdiQpZ/zOJlFyk6y+94wXzv6RNZgaR4=
+github.com/patrickmn/go-cache v2.1.0+incompatible h1:HRMgzkcYKYpi3C8ajMPV8OFXaaRUnok+kx1WdO15EQc=
+github.com/patrickmn/go-cache v2.1.0+incompatible/go.mod h1:3Qf8kWWT7OJRJbdiICTKqZju1ZixQ/KpMGzzAfe6+WQ=

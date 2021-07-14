@@ -13,13 +13,13 @@ import (
 type RsListMailboxCustomFields struct {
 	Embedded struct {
 		Fields []struct {
-			ID       int    `json:"id"`
+			ID       uint64 `json:"id"`
 			Required bool   `json:"required"`
 			Order    int    `json:"order"`
 			Type     string `json:"type"`
 			Name     string `json:"name"`
 			Options  []struct {
-				ID    int    `json:"id"`
+				ID    uint64 `json:"id"`
 				Order int    `json:"order"`
 				Label string `json:"label"`
 			} `json:"options"`
@@ -51,24 +51,24 @@ var getCustomFieldsCache = cache.New(10*time.Second, 20*time.Second)
 
 // ListCustomFields returns all the current mailbox's custom fields
 func (h *HelpScout) ListCustomFields() (fields RsListMailboxCustomFields, err error) {
-	key := strconv.Itoa(h.MailboxID) + ":ListCustomFields"
+	key := strconv.FormatUint(h.MailboxID, 10) + ":ListCustomFields"
 	v, found := getCustomFieldsCache.Get(key)
 	if found {
 		return v.(RsListMailboxCustomFields), nil
 	}
 
-	_, _, _, err = h.Exec("mailboxes/"+strconv.Itoa(h.MailboxID)+"/fields", nil, &fields, "")
+	_, _, _, err = h.Exec("mailboxes/"+strconv.FormatUint(h.MailboxID, 10)+"/fields", nil, &fields, "")
 	getCustomFieldsCache.Set(key, fields, cache.DefaultExpiration)
 
 	return
 }
 
 // GetCustomFieldIDByName gets a custom field ID by name in the current mailbox
-func (h *HelpScout) GetCustomFieldIDByName(name string) (customerFieldID int, err error) {
-	key := strconv.Itoa(h.MailboxID) + ":GetCustomFieldIDByName:" + name
+func (h *HelpScout) GetCustomFieldIDByName(name string) (customerFieldID uint64, err error) {
+	key := strconv.FormatUint(h.MailboxID, 10) + ":GetCustomFieldIDByName:" + name
 	v, found := getCustomFieldsCache.Get(key)
 	if found {
-		return v.(int), nil
+		return v.(uint64), nil
 	}
 
 	fields, err := h.ListCustomFields()
@@ -94,12 +94,12 @@ type RqUpdateCustomFields struct {
 
 // RqUpdateCustomField is a single field in the RqUpdateCustomFields request
 type RqUpdateCustomField struct {
-	ID    int         `json:"id"`
+	ID    uint64      `json:"id"`
 	Value interface{} `json:"value"`
 }
 
 // UpdateCustomFields updates all customer fields' values for the given conversation
-func (h *HelpScout) UpdateCustomFields(conversationID int, fields map[string]interface{}) (err error) {
+func (h *HelpScout) UpdateCustomFields(conversationID uint64, fields map[string]interface{}) (err error) {
 	f := make([]RqUpdateCustomField, len(fields))
 	i := 0
 	for k, v := range fields {
@@ -116,7 +116,7 @@ func (h *HelpScout) UpdateCustomFields(conversationID int, fields map[string]int
 		i++
 	}
 
-	_, _, _, err = h.Exec("conversations/"+strconv.Itoa(conversationID)+"/fields", RqUpdateCustomFields{
+	_, _, _, err = h.Exec("conversations/"+strconv.FormatUint(conversationID, 10)+"/fields", RqUpdateCustomFields{
 		Fields: f,
 	}, nil, "PUT")
 	return

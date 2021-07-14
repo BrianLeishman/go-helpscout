@@ -18,7 +18,7 @@ type NewThread struct {
 
 // Thread is an already existing thread
 type Thread struct {
-	ID     int    `json:"id"`
+	ID     uint64 `json:"id"`
 	Type   string `json:"type"`
 	Status string `json:"status"`
 	State  string `json:"state"`
@@ -32,14 +32,14 @@ type Thread struct {
 		Via  string `json:"via"`
 	} `json:"source"`
 	Customer struct {
-		ID       int    `json:"id"`
+		ID       uint64 `json:"id"`
 		First    string `json:"first"`
 		Last     string `json:"last"`
 		PhotoURL string `json:"photoUrl"`
 		Email    string `json:"email"`
 	} `json:"customer"`
 	CreatedBy struct {
-		ID       int    `json:"id"`
+		ID       uint64 `json:"id"`
 		Type     string `json:"type"`
 		First    string `json:"first"`
 		Last     string `json:"last"`
@@ -47,13 +47,13 @@ type Thread struct {
 		Email    string `json:"email"`
 	} `json:"createdBy"`
 	AssignedTo struct {
-		ID    int    `json:"id"`
+		ID    uint64 `json:"id"`
 		Type  string `json:"type"`
 		First string `json:"first"`
 		Last  string `json:"last"`
 		Email string `json:"email"`
 	} `json:"assignedTo"`
-	SavedReplyID int       `json:"savedReplyId"`
+	SavedReplyID uint64    `json:"savedReplyId"`
 	To           []string  `json:"to"`
 	Cc           []string  `json:"cc"`
 	Bcc          []string  `json:"bcc"`
@@ -61,7 +61,7 @@ type Thread struct {
 	OpenedAt     time.Time `json:"openedAt"`
 	Embedded     struct {
 		Attachments []struct {
-			ID       int    `json:"id"`
+			ID       uint64 `json:"id"`
 			Filename string `json:"filename"`
 			MimeType string `json:"mimeType"`
 			Width    int    `json:"width"`
@@ -118,9 +118,9 @@ type respThreads struct {
 }
 
 // GetThreads returns a slice of Threads
-func (h *HelpScout) GetThreads(conversationID int) (threads []Thread, err error) {
+func (h *HelpScout) GetThreads(conversationID uint64) (threads []Thread, err error) {
 	r, _, _, err := h.Exec(
-		"conversations/"+strconv.Itoa(conversationID)+"/threads",
+		"conversations/"+strconv.FormatUint(conversationID, 10)+"/threads",
 		nil,
 		&respThreads{},
 		"",
@@ -133,7 +133,7 @@ func (h *HelpScout) GetThreads(conversationID int) (threads []Thread, err error)
 }
 
 // GetLatestThreadIDFromThreads takes a Thread slice and returns the ID from the latest one
-func (h *HelpScout) GetLatestThreadIDFromThreads(threads []Thread) (threadID int, err error) {
+func (h *HelpScout) GetLatestThreadIDFromThreads(threads []Thread) (threadID uint64, err error) {
 	if len(threads) == 0 {
 		return 0, fmt.Errorf("no threads were given")
 	}
@@ -147,7 +147,7 @@ func (h *HelpScout) GetLatestThreadIDFromThreads(threads []Thread) (threadID int
 }
 
 // GetLatestThreadID takes a Conversation ID and returns the ID from the latest thread
-func (h *HelpScout) GetLatestThreadID(conversationID int) (threadID int, err error) {
+func (h *HelpScout) GetLatestThreadID(conversationID uint64) (threadID uint64, err error) {
 	threads, err := h.GetThreads(conversationID)
 	if err != nil {
 		return
@@ -157,7 +157,7 @@ func (h *HelpScout) GetLatestThreadID(conversationID int) (threadID int, err err
 }
 
 // GetEarliestThreadIDFromThreads takes a Thread slice and returns the ID from the earliest one
-func (h *HelpScout) GetEarliestThreadIDFromThreads(threads []Thread) (threadID int, err error) {
+func (h *HelpScout) GetEarliestThreadIDFromThreads(threads []Thread) (threadID uint64, err error) {
 	if len(threads) == 0 {
 		return 0, fmt.Errorf("no threads were given")
 	}
@@ -171,7 +171,7 @@ func (h *HelpScout) GetEarliestThreadIDFromThreads(threads []Thread) (threadID i
 }
 
 // GetEarliestThreadID takes a Conversation ID and returns the ID from the earliest thread
-func (h *HelpScout) GetEarliestThreadID(conversationID int) (threadID int, err error) {
+func (h *HelpScout) GetEarliestThreadID(conversationID uint64) (threadID uint64, err error) {
 	threads, err := h.GetThreads(conversationID)
 	if err != nil {
 		return
