@@ -47,7 +47,7 @@ func (t Time) MarshalJSON() ([]byte, error) {
 // The use of pointers for everything here is important
 // so that we can omit some values instead of sending blank strings
 type Customer struct {
-	ID        int    `json:"id,omitempty"`
+	ID        uint64 `json:"id,omitempty"`
 	Email     string `json:"email,omitempty"`
 	FirstName string `json:"firstName,omitempty"`
 	LastName  string `json:"lastName,omitempty"`
@@ -65,7 +65,7 @@ type Customer struct {
 type reqConversation struct {
 	Subject   string      `json:"subject"`
 	Customer  Customer    `json:"customer"`
-	MailboxID int         `json:"mailboxId"`
+	MailboxID uint64      `json:"mailboxId"`
 	Type      string      `json:"type"`
 	Status    string      `json:"status"`
 	Created   *Time       `json:"createdAt"`
@@ -73,22 +73,22 @@ type reqConversation struct {
 	Imported  bool        `json:"imported"`
 	Tags      []string    `json:"tags"`
 	Closed    *Time       `json:"closedAt"`
-	User      int         `json:"user,omitempty"`
+	User      uint64      `json:"user,omitempty"`
 }
 
 // NewConversationWithMessage creates a new message thread from the
 // given customer in the current mailbox
-func (h *HelpScout) NewConversationWithMessage(subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user int) (conversationID int, threadID int, resp []byte, err error) {
+func (h *HelpScout) NewConversationWithMessage(subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user uint64) (conversationID uint64, threadID uint64, resp []byte, err error) {
 	return h.NewConversationWithThread("customer", subject, customer, created, tags, content, searchForThreadID, closed, user)
 }
 
 // NewConversationWithReply creates a reply thread to the given customer
-func (h *HelpScout) NewConversationWithReply(subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user int) (conversationID int, threadID int, resp []byte, err error) {
+func (h *HelpScout) NewConversationWithReply(subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user uint64) (conversationID uint64, threadID uint64, resp []byte, err error) {
 	return h.NewConversationWithThread("reply", subject, customer, created, tags, content, searchForThreadID, closed, user)
 }
 
 // NewConversationWithThread creates a conversation and a thread with the given customer information
-func (h *HelpScout) NewConversationWithThread(threadType string, subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user int) (conversationID int, threadID int, resp []byte, err error) {
+func (h *HelpScout) NewConversationWithThread(threadType string, subject string, customer Customer, created time.Time, tags []string, content string, searchForThreadID bool, closed bool, user uint64) (conversationID uint64, threadID uint64, resp []byte, err error) {
 	conversationID, resp, err = h.NewConversation(subject, customer, created, tags, []NewThread{{
 		Type:     threadType,
 		Customer: customer,
@@ -111,7 +111,7 @@ func (h *HelpScout) NewConversationWithThread(threadType string, subject string,
 }
 
 // NewConversation creates a new conversation with the given customer and returns the new Conversation ID
-func (h *HelpScout) NewConversation(subject string, customer Customer, created time.Time, tags []string, threads []NewThread, closed bool, user int) (conversationID int, resp []byte, err error) {
+func (h *HelpScout) NewConversation(subject string, customer Customer, created time.Time, tags []string, threads []NewThread, closed bool, user uint64) (conversationID uint64, resp []byte, err error) {
 	if len(subject) == 0 {
 		return 0, nil, fmt.Errorf("subjects cannot be blank")
 	}
@@ -151,7 +151,7 @@ func (h *HelpScout) NewConversation(subject string, customer Customer, created t
 		return
 	}
 
-	conversationID, _ = strconv.Atoi(header.Get("Resource-ID"))
+	conversationID, _ = strconv.ParseUint(header.Get("Resource-ID"), 10, 64)
 	return
 }
 
@@ -187,18 +187,18 @@ type RsListConversations struct {
 
 // Conversation is a Help Scout conversation
 type Conversation struct {
-	ID        int    `json:"id"`
+	ID        uint64 `json:"id"`
 	Number    int    `json:"number"`
 	Threads   int    `json:"threads"`
 	Type      string `json:"type"`
-	FolderID  int    `json:"folderId"`
+	FolderID  uint64 `json:"folderId"`
 	Status    string `json:"status"`
 	State     string `json:"state"`
 	Subject   string `json:"subject"`
 	Preview   string `json:"preview"`
 	MailboxID int    `json:"mailboxId"`
 	CreatedBy struct {
-		ID       int    `json:"id"`
+		ID       uint64 `json:"id"`
 		Type     string `json:"type"`
 		First    string `json:"first"`
 		Last     string `json:"last"`
@@ -206,7 +206,7 @@ type Conversation struct {
 		Email    string `json:"email"`
 	} `json:"createdBy,omitempty"`
 	CreatedAt            time.Time `json:"createdAt"`
-	ClosedBy             int       `json:"closedBy"`
+	ClosedBy             uint64    `json:"closedBy"`
 	UserUpdatedAt        time.Time `json:"userUpdatedAt"`
 	CustomerWaitingSince struct {
 		Time     time.Time `json:"time"`
@@ -220,7 +220,7 @@ type Conversation struct {
 	Cc              []interface{} `json:"cc"`
 	Bcc             []interface{} `json:"bcc"`
 	PrimaryCustomer struct {
-		ID       int    `json:"id"`
+		ID       uint64 `json:"id"`
 		Type     string `json:"type"`
 		First    string `json:"first"`
 		Last     string `json:"last"`
@@ -265,7 +265,7 @@ func (h *HelpScout) ListConversations(query string) (conversations []Conversatio
 	}
 
 	for {
-		_, _, _, err = h.Exec("conversations?status=all&mailbox="+strconv.Itoa(h.MailboxID)+"&page="+strconv.Itoa(page)+query, nil, &rs, "")
+		_, _, _, err = h.Exec("conversations?status=all&mailbox="+strconv.FormatUint(h.MailboxID, 10)+"&page="+strconv.Itoa(page)+query, nil, &rs, "")
 		if err != nil {
 			return nil, err
 		}

@@ -8,7 +8,7 @@ import (
 type respMailboxes struct {
 	Embedded struct {
 		Mailboxes []struct {
-			ID        int       `json:"id"`
+			ID        uint64    `json:"id"`
 			Name      string    `json:"name"`
 			Slug      string    `json:"slug"`
 			Email     string    `json:"email"`
@@ -51,7 +51,7 @@ type respMailboxes struct {
 }
 
 // SetMailboxID sets the current mailbox ID
-func (h *HelpScout) SetMailboxID(id int) {
+func (h *HelpScout) SetMailboxID(id uint64) {
 	h.MailboxID = id
 	h.MailboxSelected = true
 }
@@ -80,7 +80,7 @@ L:
 				h.SetMailboxID(m.ID)
 				break L
 			}
-		case int:
+		case uint64:
 			if m.ID == mailbox {
 				h.SetMailboxID(m.ID)
 				break L
@@ -91,7 +91,7 @@ L:
 	}
 
 	if !h.MailboxSelected {
-		return fmt.Errorf("Couldn't find mailbox named/with id '%v'", mailbox)
+		return fmt.Errorf("couldn't find mailbox named/with id '%v'", mailbox)
 	}
 
 	return nil

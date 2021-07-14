@@ -20,7 +20,7 @@ import (
 // RetryCount is the number of times retired functions get retried
 var RetryCount = 10
 
-func log(connNum int, msg interface{}) {
+func log(connNum uint64, msg interface{}) {
 	fmt.Println(Sprintf("%s %s: %s", time.Now().Format("2006-01-02 15:04:05.000000"), Colorize(fmt.Sprintf("HelpScout%d", connNum), MagentaFg|BoldFm), msg))
 }
 
@@ -47,9 +47,9 @@ type HelpScout struct {
 	AppID           string
 	AppSecret       string
 	AccessToken     string
-	MailboxID       int
+	MailboxID       uint64
 	MailboxSelected bool
-	ConnNum         int
+	ConnNum         uint64
 	accessTokenMtx  sync.RWMutex
 	reqMtx          sync.Mutex
 }
@@ -62,7 +62,7 @@ func (h *HelpScout) ReadAccessToken() string {
 	return accessToken
 }
 
-var nextConnNum = 0
+var nextConnNum uint64 = 0
 var nextConnNumMutex = sync.RWMutex{}
 
 // New returns a new Help Scout instance
@@ -93,7 +93,7 @@ func New(appID string, appSecret string) (h *HelpScout, err error) {
 type respToken struct {
 	TokenType   string `json:"token_type"`
 	AccessToken string `json:"access_token"`
-	ExpiresIn   int    `json:"expires_in"`
+	ExpiresIn   uint64 `json:"expires_in"`
 }
 
 // GetNewAccessToken gets an access token for the Help Scout API
@@ -151,12 +151,12 @@ func (h *HelpScout) RawExec(u string, v interface{}, dest interface{}, method st
 			if len(method) == 0 {
 				method = "POST"
 			}
-			switch v.(type) {
+			switch v := v.(type) {
 			case url.Values:
 				if Verbose {
-					params = v.(url.Values).Encode()
+					params = v.Encode()
 				}
-				req, err = http.NewRequest(method, u, strings.NewReader(v.(url.Values).Encode()))
+				req, err = http.NewRequest(method, u, strings.NewReader(v.Encode()))
 				req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 			default:
 				var j []byte
